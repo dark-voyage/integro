@@ -1,5 +1,6 @@
-from .logger import init as logger, log
+import colorama
+from .logger import log
 
 
 def main():
-    logger()
+    colorama.init()

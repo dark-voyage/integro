@@ -1,6 +1,4 @@
-import sys
-import subprocess
-from env import *
+from util.env import *
 from telethon import TelegramClient
 
 # try:

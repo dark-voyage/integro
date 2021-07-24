@@ -3,6 +3,8 @@ import csv
 # import getpass
 import os
 
+import controller.channels
+import util
 from core import client
 
 
@@ -18,12 +20,12 @@ async def main():
     #     await client.sign_in(password=getpass.getpass())
 
     if not os.path.isdir('CSV'):
-        print('WARN: Seems like a folder for CSV outputs does not exist. Let me create it for you...')
+        util.log('warn', 'Seems like a folder for CSV outputs does not exist. Let me create it for you...')
         os.mkdir('CSV')
         pass
 
     if not os.path.isdir('JSON'):
-        print('WARN: Seems like a folder for JSON outputs does not exist. Let me create it for you...')
+        util.log('warn', 'Seems like a folder for JSON outputs does not exist. Let me create it for you...')
         os.mkdir('JSON')
         pass
 
@@ -32,6 +34,9 @@ async def main():
     # channels.txt file should be located at the 'Scraping' folder on your desktop
     # TODO: Write an automation for channels listing (due tomorrow: genemator)
     #
+
+    if not os.path.isfile('channels.txt'):
+        controller.channels.main()
 
     with open('channels.txt') as f:
         channels = f.readlines()
@@ -63,10 +68,10 @@ async def main():
                     writer.writerow([key, value])
                 pass
             pass
-            print(f"SUCCESS: The CSV file has been created successfully for {name} channel")
+            util.log('success', f"The CSV file has been created successfully for {name} channel")
             os.chdir('..')
         except Exception as error:
-            print(f"ERROR: Could not create the csv file of {name} channel")
+            util.log('error', f"Could not create the csv file of {name} channel")
             pass
 
         try:
@@ -78,7 +83,7 @@ async def main():
                 # This one doesn't
                 # json.dump(post_dict, json_file)
             pass
-            print(f"SUCCESS: The JSON file has been created successfully for {name} channel")
+            util.log('success', f"The JSON file has been created successfully for {name} channel")
             os.chdir('..')
         except Exception as error:
-            print(f"ERROR: Could not create the JSON file of {name} channel")
+            util.log('error', f"Could not create the JSON file of {name} channel")
