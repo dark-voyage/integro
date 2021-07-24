@@ -6,7 +6,7 @@ from colorama import Fore, Back, Style
 
 def main():
     if os.path.isfile('channels.txt'):
-        util.log('warn', 'Looks like you have channels.txt which will be used by the program.')
+        util.log('info', 'You have channels.txt, which will be used by the program.')
 
     if not os.path.isfile('channels.txt'):
         channels = []
