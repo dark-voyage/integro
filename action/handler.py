@@ -29,12 +29,6 @@ async def main():
         os.mkdir('JSON')
         pass
 
-    #
-    # Notice!
-    # channels.txt file should be located at the 'Scraping' folder on your desktop
-    # TODO: Write an automation for channels listing (due tomorrow: genemator)
-    #
-
     if not os.path.isfile('channels.txt'):
         controller.channels.main()
 
