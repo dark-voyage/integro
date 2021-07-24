@@ -24,10 +24,23 @@ async def main():
 
     name = "unified_file"
     posts = {}
-    for channel in channels:
+    
+    with open("translator.json", "r", encoding="UTF-8") as file:
+        translator = json.load(file)
+    
+    for i, channel in enumerate(channels):
         try:
-            async for message in util.client.iter_messages(channel, limit=1000):
-                posts[message.id] = message.text
+            async for message in util.client.iter_messages(channel, limit=2):
+                message_text = message.text
+                message_text_new = ""
+                for char in message_text:
+                    if char in translator:
+                        message_text_new += translator[char]
+                    else:
+                        message_text_new += char
+                                     
+                message_id = str(i) + "-" + message.id
+                posts[message_id] = message_text_new
         except Exception as excp:
             util.log('error', f"Cannot find any entity corresponding to {channel}.")
     
@@ -40,4 +53,7 @@ async def main():
         util.log('success', f"The JSON file has been created successfully for {name} channel")
         os.chdir('..')
     except Exception as error:
-        util.log('error', f"Could not create the JSON file of {name} channel: " + error)
+        util.log('error', f"Could not create the JSON file of {name} channel: ")
+
+
+
