@@ -1,7 +1,5 @@
 import os
 import pathlib
-
-import controller.directory
 import util
 
 
@@ -32,8 +30,3 @@ def main():
         util.log('success', 'Successfully entered \'Scraping\' folder')
 
     util.log('info', "Now your current path is: " + os.getcwd())
-
-    # No need for this when Python cwd got smarter
-    # os.chdir("C:/Users/a.orzikulov/Desktop/scraping")
-
-    pass

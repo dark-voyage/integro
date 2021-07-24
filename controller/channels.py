@@ -6,8 +6,8 @@ from colorama import Fore, Back, Style
 
 def main():
     if os.path.isfile('channels.txt'):
-        util.log('warn', 'Looks like you have channels.txt which will be used by the program. Modify the file to '
-                         'change your targets')
+        util.log('warn', 'Looks like you have channels.txt which will be used by the program.')
+
     if not os.path.isfile('channels.txt'):
         channels = []
         is_first_time = True
