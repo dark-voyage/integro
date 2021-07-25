@@ -1,7 +1,7 @@
 from .directory import main as _directory
-from .channels import main as _channels
+from .links import main as _links
 
 
 def main():
     _directory()
-    _channels()
+    _links()
