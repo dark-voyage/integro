@@ -1,82 +1,74 @@
-import json
+import re
 import os
-import controller.channels
+import json
 import util
+import controller.links
+from transliterate import translit
 
 
 async def main():
-    if not os.path.isdir('JSON'):
-        util.log('warn', 'Seems like a folder for JSON outputs does not exist. Let me create it for you...')
-        os.mkdir('JSON')
+    if not os.path.isdir('Database'):
+        util.log('warn', 'Seems like a folder for database outputs does not exist. Let me create it for you...')
+        os.mkdir('Database')
         pass
 
-    if not os.path.isfile('channels.txt'):
-        controller.channels.main()
+    if not os.path.isfile('links.txt'):
+        controller.links.main()
 
-    with open('channels.txt') as f:
-        channels = f.readlines()
+    with open('links.txt') as f:
+        links = f.readlines()
 
-    #
-    # All links in channels.txt should be seperated by a new line
-    # Expected parsed file results:
-    # [ 'https://t.me/example', 'https://t.me/example' ]
-    #
+    groups = []
+    channels = []
 
-    name = "unified_file"
+    for link in links:
+        search = re.search(r"[https?://]?[telegram|t]\.me(/joinchat)?/([a-zA-Z0-9_]+)", link)
+        if search is not None:
+            util.log('success', f"Congrats, the url {link.rstrip()} is valid!")
+            username = search.groups()[1]
+            if search.groups()[0] is None:
+                channels.append(f"https://t.me/{username}")
+            else:
+                groups.append(f"https://t.me/joinchat/{username}")
+        else:
+            util.log('warn', f"Sorry, the url {link.rstrip()} is not telegram validated url!")
+
     posts = {}
-    
-    with open("translator.json", "r", encoding="UTF-8") as file:
-        translator = json.load(file)
-
-    # print(await util.client.get_me())
 
     #
-    # TODO: Implement private group link
-    # TODO: https://t.me/joinchat/******
+    # TODO: Implement private group link analyzer (due: in a day [today] || in 2 days @genemator)
     #
 
-    for channel in channels:
-        if channel not in posts:
-            posts[channel] = {}
+    if len(channels):
+        for channel in channels:
+            if channel not in posts:
+                posts[channel] = {}
+            try:
+                async for message in util.client.iter_messages(channel, limit=10):
+                    posts[channel][message.id] = translit(u"" + message.message, 'uz')
+            except Exception as error:
+                pass
+            util.log('success', f"The channel {channel.rstrip()} has been successfully analyzed!")
+
         try:
-            async for message in util.client.iter_messages(channel):
-                fixed_message = ""
-                for character in message.message:
-                    if character in translator.keys():
-                        fixed_message += translator[character]
-                    if character not in translator.keys():
-                        util.log('warn', f"The character \"{character}\" can't be found! Leaving as it is...")
-                        fixed_message += character
-                    else:
-                        # util.log('error', 'Unexpected behavior occurred! Leaving the character...')
-                        fixed_message += character
-                posts[channel][message.id] = fixed_message
+            os.chdir('Database')
+
+            count = 0
+            name = ""
+
+            while True:
+                if os.path.isfile(f"{util.filename(count)}.json"):
+                    count += 1
+                if not os.path.isfile(f"{util.filename(count)}.json"):
+                    name = util.filename(count)
+                    break
+
+            with open(f"{name}.json", "w", encoding="UTF-8") as json_file:
+                json_file.write(json.dumps(posts, indent=4, sort_keys=True))
+
+            util.log('success', f"The JSON file has been created successfully as {os.getcwd()}/{name}.json")
+            os.chdir('..')
         except Exception as error:
-            pass
-    """
-    for i, channel in enumerate(channels):
-        try:
-            async for message in util.client.iter_messages(channel, limit=2):
-                message_text = message.text
-                message_text_new = ""
-                for char in message_text:
-                    if char in translator:
-                        message_text_new += translator[char]
-                    else:
-                        message_text_new += char
-                                     
-                message_id = str(i) + "-" + message.id
-                posts[message_id] = message_text_new
-        except Exception as excp:
-            util.log('error', f"Cannot find any entity corresponding to {channel}.")
-    """
-    # creating JSON folder for each kind of data type
-    try:
-        os.chdir('JSON')
-        with open(f"{name}.json", "w", encoding="UTF-8") as json_file:
-            json_file.write(json.dumps(posts, indent=4, sort_keys=True))
-
-        util.log('success', f"The JSON file has been created successfully for {name} channel")
-        os.chdir('..')
-    except Exception as error:
-        util.log('error', f"Could not create the JSON file of {name} channel: ")
+            util.log('error', f"Could not create the JSON file")
+    else:
+        util.log('error', 'Oh, list seems to be empty... Can\'t proceed with analyzing!')

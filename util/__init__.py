@@ -1,7 +1,13 @@
-import colorama
 from .logger import log
 from .env import client
+from .filename import filename
+from colorama import init as colorama
+from .translit import init as translit
+from .packages import init as install
 
 
 def main():
-    colorama.init()
+    install()
+    colorama()
+    translit()
+
