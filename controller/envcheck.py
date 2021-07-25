@@ -1,5 +1,5 @@
 import os
 import sys
 
-def main():
-    if os.path.isfile('config.ini'):
+# def main():
+#     if os.path.isfile('config.ini'):
