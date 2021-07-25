@@ -7,8 +7,8 @@ class UzbekCyrillicTranslit(TranslitLanguagePack):
     language_code = "uz"
     language_name = "Uzbek"
     mapping = (
-        u"АБДЭФГҲИЖКҚЛМНОПРСТУВХЙЗЪабдэфгҳижкқлмнопрстувхйзъ«»„“—",
-        u"ABDEFGHIJKQLMNOPRSTUVXYZ'abdefghijkqlmnoprstuvxyz'\"\"\"\"-",
+        u"АБДЭФГҲИЖКҚЛМНОПРСТУВХЙЗЪабдэфгҳижкқлмнопрстувхйзъ«»„“—‘’ ",
+        u"ABDEFGHIJKQLMNOPRSTUVXYZ'abdefghijkqlmnoprstuvxyz'\"\"\"\"-'' ",
     )
     pre_processor_mapping = {
         # Uppercase characters
