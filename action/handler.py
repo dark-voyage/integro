@@ -73,4 +73,4 @@ async def main(client):
     else:
         log('error', 'Oh, list seems to be empty... Can\'t proceed with analyzing!')
 
-    await client.disconnected
+    # await client.disconnected
