@@ -1,5 +1,4 @@
 from .logger import log
-from .env import client
 from .filename import filename
 from colorama import init as colorama
 from .translit import init as translit
@@ -10,4 +9,3 @@ def main():
     install()
     colorama()
     translit()
-
