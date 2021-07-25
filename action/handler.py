@@ -44,7 +44,6 @@ async def main():
                 for character in message.message:
                     if character in translator.keys():
                         fixed_message += translator[character]
-                    if character
                     if character not in translator.keys():
                         util.log('warn', f"The character \"{character}\" can't be found! Leaving as it is...")
                         fixed_message += character
