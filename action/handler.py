@@ -27,7 +27,34 @@ async def main():
     
     with open("translator.json", "r", encoding="UTF-8") as file:
         translator = json.load(file)
-    
+
+    # print(await util.client.get_me())
+
+    #
+    # TODO: Implement private group link
+    # TODO: https://t.me/joinchat/******
+    #
+
+    for channel in channels:
+        if channel not in posts:
+            posts[channel] = {}
+        try:
+            async for message in util.client.iter_messages(channel):
+                fixed_message = ""
+                for character in message.message:
+                    if character in translator.keys():
+                        fixed_message += translator[character]
+                    if character
+                    if character not in translator.keys():
+                        util.log('warn', f"The character \"{character}\" can't be found! Leaving as it is...")
+                        fixed_message += character
+                    else:
+                        # util.log('error', 'Unexpected behavior occurred! Leaving the character...')
+                        fixed_message += character
+                posts[channel][message.id] = fixed_message
+        except Exception as error:
+            pass
+    """
     for i, channel in enumerate(channels):
         try:
             async for message in util.client.iter_messages(channel, limit=2):
@@ -43,7 +70,7 @@ async def main():
                 posts[message_id] = message_text_new
         except Exception as excp:
             util.log('error', f"Cannot find any entity corresponding to {channel}.")
-    
+    """
     # creating JSON folder for each kind of data type
     try:
         os.chdir('JSON')
@@ -54,6 +81,3 @@ async def main():
         os.chdir('..')
     except Exception as error:
         util.log('error', f"Could not create the JSON file of {name} channel: ")
-
-
-
