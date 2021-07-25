@@ -44,7 +44,7 @@ async def main():
             if channel not in posts:
                 posts[channel] = {}
             try:
-                async for message in util.client.iter_messages(channel, limit=10):
+                async for message in util.client.iter_messages(channel):
                     posts[channel][message.id] = translit(u"" + message.message, 'uz')
             except Exception as error:
                 pass
