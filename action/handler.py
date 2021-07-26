@@ -26,13 +26,16 @@ async def main(client):
         search = re.search(r"[https?://]?[telegram|t]\.me(/joinchat)?/([a-zA-Z0-9_]+)", link)
         if search is not None:
             # util.log('success', f"Congrats, the url {link.rstrip()} is valid!")
-            username = search.groups()[1]
+            # username = search.groups()[1]
+            link_stripped = link.rstrip()
             if search.groups()[0] is None:
-                channels.append(f"https://t.me/{username}")
+                channels.append(link_stripped)
+                # channels.append(f"https://t.me/{username}")
             else:
-                groups.append(f"https://t.me/joinchat/{username}")
+                groups.append(link_stripped)
+                # groups.append(f"https://t.me/joinchat/{username}")
         else:
-            log('warn', f"Sorry, the url {link.rstrip()} is not a valid telegram url!")
+            log('warn', f"Sorry, the url {link_stripped} is not a valid telegram url!")
 
     posts = {}
 
@@ -45,11 +48,13 @@ async def main(client):
             if channel not in posts:
                 posts[channel] = {}
             try:
-                async for message in client.iter_messages(channel, limit=2):
+                entity = await client.get_input_entity(channel)
+                async for message in client.iter_messages(entity, limit=2):
                     posts[channel][message.id] = translit(u"" + message.message, 'uz')
+                log('success', f"The channel {channel} has been successfully analyzed!")
             except Exception as error:
                 log('error', str(error))
-            log('success', f"The channel {channel.rstrip()} has been successfully analyzed!")
+                log('error', f"Could not analyze {channel}!")
 
         # writing to a JSON file
         try:
