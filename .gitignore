@@ -135,3 +135,4 @@ dmypy.json
 # Session and configs
 config.ini
 *.session
+*.session-journal
