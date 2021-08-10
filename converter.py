@@ -1,9 +1,13 @@
 import json
 import fasttext
 import re
+import os
 from transliterate import translit
+import util
 
-file_path = "/Users/asrorbek/Desktop/Scraping/Database/output-28-7-2021.json"
+util.main()
+os.chdir("/Users/a.orzikulov/Desktop/GitHub/Integro")
+file_path = "output-28-7-2021.json"
 with open(file_path, "r", encoding="UTF-8") as file:
     data = json.load(file)
 
@@ -36,5 +40,3 @@ text
 predictions = model.predict(text)
 print(predictions)
 
-import util
-util.main()
