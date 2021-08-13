@@ -3,7 +3,6 @@ import os
 import re
 from util import log, filename
 import controller.links
-from transliterate import translit
 
 
 async def main(client):
@@ -49,8 +48,8 @@ async def main(client):
                 posts[channel] = {}
             try:
                 entity = await client.get_input_entity(channel)
-                async for message in client.iter_messages(entity, limit=2):
-                    posts[channel][message.id] = translit(u"" + message.message, 'uz')
+                async for message in client.iter_messages(entity, limit=3000, wait_time=15):
+                    posts[channel][message.id] = message.message
                 log('success', f"The channel {channel} has been successfully analyzed!")
             except Exception as error:
                 log('error', str(error))
@@ -73,9 +72,7 @@ async def main(client):
             log('success', f"The JSON file has been created successfully as {os.getcwd()}/{name}.json")
             os.chdir('..')
         except Exception as error:
-            log('error', f"Could not create the JSON file")
+            log('error', "Could not create the JSON file")
             log('error', str(error))
     else:
         log('error', 'Oh, list seems to be empty... Can\'t proceed with analyzing!')
-
-    # await client.disconnected
