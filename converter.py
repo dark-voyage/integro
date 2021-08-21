@@ -2,42 +2,65 @@ import json
 import fasttext
 import re
 import os
+
+os.chdir("/Users/a.orzikulov/Desktop/GitHub/Integro")
+
 import util
 from util.convert_helpers import (TRANSLATOR, STOP_SYMBOLS, VOWELS, 
                                   change_e, change_ts)
 
 util.main()
-os.chdir("/Users/a.orzikulov/Desktop/GitHub/Integro")
-file_path = "output-28-7-2021.json"
+file_path = "output-13-8-2021.json"
 with open(file_path, "r", encoding="UTF-8") as file:
     data = json.load(file)
 
-LANGUAGE_MODEL_PATH = '/Users/asrorbek/GitHub/integro_old/lid.176.bin'
+LANGUAGE_MODEL_PATH = '../lid.176.bin'
 model = fasttext.load_model(LANGUAGE_MODEL_PATH)
+
+def multiple_replace(pairs, string):
+    def replace(m):
+        return next(
+            replacement
+            for (pattern, replacement), group in zip(pairs.items(), m.groups())
+            if group is not None
+        )
+    patterns = '|'.join("({})".format(pattern) for pattern in pairs)
+    return re.sub(patterns, replace, string)
+
+
+REPLACEMENTS = {r"[ (]?[Hh]ttps?[:%]\S+\s?": "",
+                r"\n": " ",
+                u"\U0001f1fa\U0001f1ff": "",
+                r"@\S+\s?": "",
+                r"#\S+\s?": "", 
+                u"\u2757": "",
+                u"\u200b": "",
+                u"Actual News\U0001f1fa\U0001f1ff": "", # uz flag
+                u"Актуальные новости Узбекистана🇺🇿🇺🇿🇺🇿": ""}
 
 russian_texts = []
 uzbek_texts = []
-for posts in data.values():
-    for post_text in posts.values():
-        if post_text != "None" and post_text != "":
-            post_text = re.sub(r"[ (]?[Hh]ttps?[:%].+/s?", "", post_text)
-            post_text = re.sub(r"\s", " ", post_text)
-            prediction, score = model.predict(post_text)
-            if prediction[0] == "__label__ru" and score[0] >= 0.8:
-                russian_texts.append(post_text)
-            else:
-                uzbek_texts.append(post_text)
+# for posts in data.values():
+for post_text in data["https://t.me/Buka_tumani"].values():     ################################ posts
+    if not any([post_text == "None", post_text == "", post_text is None]):
+        post_text = multiple_replace(REPLACEMENTS, post_text)
+        prediction, score = model.predict(post_text)
+        if prediction[0] == "__label__ru" and score[0] >= 0.8:
+            russian_texts.append(post_text)
+        else:
+            uzbek_texts.append(post_text)
 
 print(len(uzbek_texts))
 print(len(russian_texts))
 
-with open("uzbek_texts.txt", "w", encoding="UTF-8") as file:
+with open("../uzbek_texts.txt", "w", encoding="UTF-8") as file:
     for text in uzbek_texts:
         file.writelines(text + "\n")
 
-with open("russian_texts.txt", "w", encoding="UTF-8") as file:
+with open("../russian_texts.txt", "w", encoding="UTF-8") as file:
     for text in russian_texts:
         file.writelines(text + "\n")
+
 
 with open("links.txt", "w", encoding="UTF-8") as file:
     for key in data:
