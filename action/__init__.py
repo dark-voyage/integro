@@ -1,1 +1,1 @@
-from .handler import main as handler
+from .handler import main as get_posts

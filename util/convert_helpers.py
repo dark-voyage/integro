@@ -1,3 +1,5 @@
+import re
+
 TRANSLATOR = {
     u'А': 'A',
     u'Б': 'B',
@@ -140,8 +142,20 @@ STOP_SYMBOLS = {";", "?", "!", ".", ",", " "}
 VOWELS = {"а", "у", "о", "ы", "и", "э", "я", "ю", "ё", "е",
           "Ё", "А", "Е", "И", "О", "У", "Ы", "Э", "Ю", "Я"}
 
+REPLACEMENTS = {r"[ (]?[Hh]ttps?[:%]\S+\s?": "",
+                r"\n": " ",
+                u"\U0001f1fa\U0001f1ff": "",
+                r"@\S+\s?": "",
+                r"#\S+\s?": "", 
+                u"\u2757": "",
+                u"\u200b": "",
+                u"Actual News\U0001f1fa\U0001f1ff": "", # uz flag
+                u"Актуальные новости Узбекистана🇺🇿🇺🇿🇺🇿": "",
+                r"[Сс]ентябр": "sentabr",
+                r"[Оо]ктябр": "oktabr"}
 
-def change_e(index, text):
+
+def change_e(index, text, translator, stop_symbols, vowels):
     """
     Change Cyrillic `e` to Latin `e` or `ye`.
     """
@@ -150,15 +164,15 @@ def change_e(index, text):
     else:
         previous_char = text[index-1]
 
-    if previous_char == "None" or previous_char in STOP_SYMBOLS:
-        return TRANSLATOR[text[index]][0]
-    elif previous_char in VOWELS:
-        return TRANSLATOR[text[index]][0]
+    if previous_char == "None" or previous_char in stop_symbols:
+        return translator[text[index]][0]
+    elif previous_char in vowels:
+        return translator[text[index]][0]
     else:
-        return TRANSLATOR[text[index]][1]
+        return translator[text[index]][1]
 
 
-def change_ts(index, text):
+def change_ts(index, text, translator, stop_symbols, vowels):
     """
     Change Cyrillic `ц` to Latin `s` or `ts`.
     """
@@ -167,14 +181,25 @@ def change_ts(index, text):
     else:
         previous_char = text[index-1]
 
-    if previous_char == "None" or previous_char in STOP_SYMBOLS:
-        return TRANSLATOR[text[index]][0]
-    elif previous_char in VOWELS:
+    if previous_char == "None" or previous_char in stop_symbols:
+        return translator[text[index]][0]
+    elif previous_char in vowels:
         if index == len(text) - 1:
-            return TRANSLATOR[text[index]][0]
-        elif text[index+1] in STOP_SYMBOLS:
-            return TRANSLATOR[text[index]][0]
+            return translator[text[index]][0]
+        elif text[index+1] in stop_symbols:
+            return translator[text[index]][0]
         else:
-            return TRANSLATOR[text[index]][1]
+            return translator[text[index]][1]
     else:
-        return TRANSLATOR[text[index]][0]
+        return translator[text[index]][0]
+
+
+def multiple_replace(pairs, string):
+    def replace(m):
+        return next(
+            replacement
+            for (pattern, replacement), group in zip(pairs.items(), m.groups())
+            if group is not None
+        )
+    patterns = '|'.join("({})".format(pattern) for pattern in pairs)
+    return re.sub(patterns, replace, string)
